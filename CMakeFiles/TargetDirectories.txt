@@ -1,3 +1,0 @@
-/home/miika/Documents/miika/hobby/dev/GridSnake/CMakeFiles/rebuild_cache.dir
-/home/miika/Documents/miika/hobby/dev/GridSnake/CMakeFiles/edit_cache.dir
-/home/miika/Documents/miika/hobby/dev/GridSnake/CMakeFiles/GridSnake.dir
