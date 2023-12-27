@@ -17,14 +17,12 @@ public:
     float hitbox={25.f};
     sf::Sprite head;
     sf::Texture headTexture;
-    sf::Texture skin;
     sf::Texture bodyTexture;
-    //sf::Sprite headSprite;
+    sf::Sprite skin;
     std::deque<sf::Sprite> cq;
     std::deque<sf::Sprite> visibleSeqments;
     std::list<sf::Sprite> body;
     sf::Vector2<float> velocity{ 0.1f,0.0f};
-private:
    
 };
 
@@ -34,15 +32,16 @@ Snake::Snake(){
     //
     if (!headTexture.loadFromFile("./assets/GridSnake_head.png"))
     { } 
-    if (!bodyTexture.loadFromFile("./assets/GridSnake_body.png"))
+    if (!bodyTexture.loadFromFile("./assets/snake_body_3d.png"))
     { } 
     head.setTexture(bodyTexture);
-   
+    skin.setTexture(bodyTexture);
+    head.setScale(sf::Vector2f(0.025f,0.025f));
+    skin.setScale(sf::Vector2f(1.5f, 1.0f)); // absolute scale factor
+    //skin.scale(sf::Vector2f(1.5f, 3.f)); // factor relative to the current scale
+    // skin.setTextureRect(sf::IntRect(1000, 1000, 3200, 3200));
+
     //Create snake head
-    //
-    
-    head.scale(0.5,0.5);
-    //head.setRadius(25.f);
     head.setPosition(30,85);
     //head.setFillColor(sf::Color::Green);
     sf::Rect<float> size = head.getLocalBounds();
@@ -65,7 +64,7 @@ public:
     void move();
     sf::Time deltaTime;
 private:
-    Snake snake;
+    Snake* snake = new Snake();
     char input;
     int windowWidth{715};
     int windowHeight{715};
@@ -112,13 +111,13 @@ Game::Game(): window(sf::VideoMode(windowWidth,windowHeight),"Play Snake .02"){
     }
     //Add background Texture
     
-    if (!texture.loadFromFile("./assets/GridSnake_floor.png"))
+    if (!texture.loadFromFile("./assets/floor_sonic.png"))
     { } 
       //texture.loadFromFile("./assets/GridSnake_floorTest.png");
     //texture.setRepeated(true); 
     texture.setRepeated(true);
     background.setTexture(texture);
-    background.setColor(sf::Color(255, 255, 255, 128));
+//    background.setColor(sf::Color(255, 255, 255, 128));
     background.setOrigin(sf::Vector2f(0,0));
     background.setTextureRect(sf::IntRect(0,0, 500, 500));
     background.setScale(sf::Vector2f(2,2));
@@ -177,51 +176,49 @@ void Game::eventListener(){
 void Game::render(){
     window.clear();
     
-    
     //Draw window border
-    //
-    //window.draw(border);
-    
+    //window.draw(border); 
+
+
     //Draw background
-    //
     window.draw(background);
+    
     //Draw Grid
-    //
     for (const auto& e : verticalLines){window.draw(e);}
     for (const auto& e : horizontalLines){window.draw(e);}  
          
-    snake.head.setTexture(snake.headTexture);     
-    window.draw(snake.head);
+    //snake->head.setTexture(snake.headTexture);     
+    window.draw(snake->head);
     
     //Draw Snake
     //
     
-    //snake.cq.push_front(snake.head);        
-    while((int)snake.body.size() >= snake.size){
-        snake.body.pop_back();
+    //snake->cq.push_front(snake.head);        
+    while((int)snake->body.size() >= snake->size){
+        snake->body.pop_back();
     }    /*
     //index rendering
     
     int index{0};
-    for(int i=index; i < (int)snake.body.size();i++){
-        window.draw(snake.body. at(i));
+    for(int i=index; i < (int)snake->body.size();i++){
+        window.draw(snake->body. at(i));
     };
     
     std::list<sf::CircleShape>::iterator it;
-    for (it = snake.body.begin(); it != snake.body.end();++it){
+    for (it = snake->body.begin(); it != snake.body.end();++it){
         window.draw(it);
     }*/
     /**/
     
    int i =0;
-    std::for_each(snake.body.begin(),snake.body.end(),[&](auto& segment){
+    std::for_each(snake->body.begin(),snake->body.end(),[&](auto& segment){
         //if(index % 200==0 ){}
             //std::cout<<index<<". size: "<<cq.size()<<std::endl;
-        if(i<=snake.size){
-             snake.head.setTexture(snake.bodyTexture); 
+        if(i<=snake->size){
+             //snake->head.setTexture(snake.bodyTexture); 
         }
-        else
-            snake.head.setTexture(snake.headTexture);
+        else{}
+           // snake->head.setTexture(snake.headTexture);
         window.draw(segment);
         i++;
         //index++;
@@ -240,19 +237,19 @@ void Game::boundCheck(){
     
     //X-axis check
     //
-    if(snake.head.getPosition().x<=0){
-        snake.head.setPosition(windowWidth-25,snake.head.getPosition().y);
+    if(snake->head.getPosition().x<=0){
+        snake->head.setPosition(windowWidth-25,snake->head.getPosition().y);
     }
-    if(snake.head.getPosition().x>=window.getSize().x){
-       snake.head.setPosition((float)30,snake.head.getPosition().y);
+    if(snake->head.getPosition().x>=window.getSize().x){
+       snake->head.setPosition((float)30,snake->head.getPosition().y);
     }
     //Y-axis check
     //
-    if(snake.head.getPosition().y<=0){
-       snake.head.setPosition((float)snake.head.getPosition().x,window.getSize().y-25);
+    if(snake->head.getPosition().y<=0){
+       snake->head.setPosition((float)snake->head.getPosition().x,window.getSize().y-25);
     }
-    if(snake.head.getPosition().y>=window.getSize().y){
-       snake.head.setPosition((float)snake.head.getPosition().x,30);
+    if(snake->head.getPosition().y>=window.getSize().y){
+       snake->head.setPosition((float)snake->head.getPosition().x,30);
     }
 }
 
@@ -261,24 +258,24 @@ void Game::collisionCheck(){
     //Collision with apples
     //
     std::for_each(apples.begin(),apples.end(),[&](auto& apple){
-        sf::Vector2<float> distanceVector{snake.head.getPosition().x-apple.getPosition().x,snake.head.getPosition().y-apple.getPosition().y};
+        sf::Vector2<float> distanceVector{snake->head.getPosition().x-apple.getPosition().x,snake->head.getPosition().y-apple.getPosition().y};
         float distanceLength{std::sqrt(distanceVector.x*distanceVector.x+distanceVector.y*distanceVector.y)};
-        if(distanceLength<=snake.hitbox){
+        if(distanceLength<=snake->hitbox){
             apple.setPosition(-10,-10);
-            snake.size+=1;
+            snake->size+=1;
         }
     });
     
     //Collision with body 
     //
     int i=0;
-    std::for_each(snake.body.begin(),snake.body.end(),[&](auto& segment){
+    std::for_each(snake->body.begin(),snake->body.end(),[&](auto& segment){
         if(i==0){
          //Snake head cannot collide with itself
          i++;
         }
-        else if(snake.head.getPosition().x==segment.getPosition().x && snake.head.getPosition().y==segment.getPosition().y){
-           snake.size=1;
+        else if(snake->head.getPosition().x==segment.getPosition().x && snake->head.getPosition().y==segment.getPosition().y){
+           snake->size=1;
         }                                                               
     });
     
@@ -286,29 +283,29 @@ void Game::collisionCheck(){
 }
 void Game::move(){
     //Movement of snake
-    switch(snake.dir){
+    switch(snake->dir){
         case UP:
-            snake.head.move(0,-55.0); break;
+            snake->head.move(0,-55.0); break;
         case DOWN:
-            snake.head.move(0,55.0); break;
+            snake->head.move(0,55.0); break;
         case LEFT:
-            snake.head.move(-55.0,0); break;
+            snake->head.move(-55.0,0); break;
         case RIGHT:
-            snake.head.move(55.0,0); break;
+            snake->head.move(55.0,0); break;
     }
-    //snake.head.setTexture(snake.bodyTexture);
-    snake.body.push_front(snake.head);
+    //snake->
+    snake->body.push_front(snake->head);
 }
 void Game::move(sf::Time deltaTime){
-    switch(snake.dir){
+    switch(snake->dir){
         case UP:
-            snake.head.move(0,-100.10); break;
+            snake->head.move(0,-100.10); break;
         case DOWN:
-            snake.head.move(0,100.10); break;
+            snake->head.move(0,100.10); break;
         case LEFT:
-            snake.head.move(-100.10,0); break;
+            snake->head.move(-100.10,0); break;
         case RIGHT:
-            snake.head.move(100.10,0); break;
+            snake->head.move(100.10,0); break;
     }
     //Movement with deltaTime
     //
@@ -347,15 +344,15 @@ void Game::run(){
        
         eventListener();
         collisionCheck();
+
         if(gameClock.getElapsedTime().asSeconds()>0.2f){ }
-            move();
-            gameClock.restart();
-       
         
+        move();
+        gameClock.restart();    
         render();
-        
         nextGameTick+=skipTicks;
         sleepTime=nextGameTick-deltaClock.getElapsedTime().asMilliseconds();
+        
         if(sleepTime>=0){
             //sleepTime;
             sf::sleep(sf::milliseconds(sleepTime));
@@ -364,12 +361,10 @@ void Game::run(){
         else {
             //myöhässä
         }
-        // Calculate deltaTime
-        //deltaTime = deltaClock.restart(); 
         
         framesPerSecond++;
     }
-}
+}//Game::run
 
 void Game::directionOnKeyPressed(char input){
     switch(input)
@@ -378,38 +373,38 @@ void Game::directionOnKeyPressed(char input){
         case 'w':
             //direction.at(0)=0.00;       //x
             //direction.at(1)=-0.05f;     //y
-            snake.dir=UP;
-            snake.head.setRotation(90.f);
+            snake->dir=UP;
+            snake->head.setRotation(90.f);
             break;
         
         case 'a':
             //direction.at(0)=-0.05;  
             //direction.at(1)=0.00f;
-            snake.dir=LEFT;
-            snake.head.setRotation(0);
+            snake->dir=LEFT;
+            snake->head.setRotation(0);
             break;
 
         case 's':
             //direction.at(0)=0.00;   
             //direction.at(1)=0.050;  
-            snake.dir=DOWN;
-            snake.head.setRotation(-90);
+            snake->dir=DOWN;
+            snake->head.setRotation(-90);
             break;
             
         case 'd':
             //direction.at(0)=0.050;  
             //direction.at(1)=0.00f;
-            snake.dir=RIGHT;
-             snake.head.setRotation(180);
+            snake->dir=RIGHT;
+             snake->head.setRotation(180);
             break;
         case 'u':
-                snake.speed+=100; break;
+                snake->speed+=100; break;
         case 'y':
-                if(snake.size>1){
-                snake.size-=1;} break;
+                if(snake->size>1){
+                snake->size-=1;} break;
         case 'g':
             try {
-                snake.size+=1;
+                snake->size+=1;
 
                 }
             catch(const std::exception& e){
@@ -417,7 +412,7 @@ void Game::directionOnKeyPressed(char input){
             }
             break;
     }
-};
+}; //Game::directionOnKeyPressed()
 
 
 std::vector<float> directionOnKeyPressed(char input, std::vector<float> direction)
