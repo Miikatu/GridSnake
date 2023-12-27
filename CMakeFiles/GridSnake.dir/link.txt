@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -Werror -std=c++14 -pthread -g   CMakeFiles/GridSnake.dir/src/Main.cpp.o  -o GridSnake  -lsfml-system -lsfml-window -lsfml-graphics 
