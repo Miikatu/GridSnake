@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(): window(sf::VideoMode(windowWidth,windowHeight),"Play Snake .02"){
+Game::Game(): window(sf::VideoMode(windowWidth,windowHeight),"Play Snake .03"){
     std::cout<<"Construction done!"<< std::endl;
     //Window border
     //
